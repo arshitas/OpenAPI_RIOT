@@ -1,1 +1,25 @@
+{{!returns the exact makelfile when combined with makefile.json}}
 
+
+{{!instead of defining application, board and riotbase directly, we can add an operation class}}
+{{!the operation class  will have three instances: application, board_name, riotbase}}
+APPLICATION =  {{ app_name }}
+
+BOARD?= {{board_name}}
+
+RIOTBASE  ?= {{directory}}
+
+{{ #package }}{{!includes the required packages as mentioned in the json file}} 
+USEMODULE += {{.}}
+{{/package}}
+
+{{!emcute_id is needed from the main.c file. I am not sure if this is the right way}}
+{{#emcute_id}} {{{emcute_id}}} {{/emcute_id}}
+
+{{! the develhelp and quiet values in RIOT are partials so these are used when specifically mentioned}}
+{{#devhelp}} {{{devhelp}}} {{/devhelp}}
+
+{{#quiet}} {{{quiet}}} {{/quiet}}
+ 
+{{!the last line is constant in all RIOT makefiles so I did not mention any tags here}}
+include $(RIOTBASE)/Makefile.include
