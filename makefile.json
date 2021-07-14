@@ -9,9 +9,10 @@
 			'emcute',
 			'shell',
 			'shell_commands',
-			'ps'
+			'gnrc_ipv6_default',
+			'gnrc_icmpv6_echo'
 		],
 		'emcute_id' : 'CFLAGS += -DEMCUTE_ID=\"$(EMCUTE_ID)\"',
 		'devhelp' : 'DEVELHELP += 1',
 		'quiet' : 'QUIET += 1'
-};
+	};
