@@ -13,6 +13,6 @@
 			"gnrc_icmpv6_echo"
 		],
 		"emcute_id" : "CFLAGS += -DEMCUTE_ID=(EMCUTE_ID)",
-		"devhelp" : "DEVELHELP1",
-		"quiet" : "QUIET1"
+		"devhelp" : "DEVELHELP+=1",
+		"quiet" : "QUIET+=1"
 	};
