@@ -10,8 +10,8 @@
 			'emcute',
 			'shell',
 			'shell_commands',
-			'ps'
-			'gnrc_icmpv6_echo'
+			'ps',
+			'gnrc_icmpv6_echo',
 		],
 		'emcute_id' : 'CFLAGS += -DEMCUTE_ID=\"$(EMCUTE_ID)\"',
 		'devhelp' : 'DEVELHELP += 1',
