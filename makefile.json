@@ -1,18 +1,18 @@
 {
-		'app_name': 'MQTTSN_RIOT',
-		'board_name': 'native',
-		'directory': '$(CURDIR)/..',
-		'package': [
-			'gnrc_netdev_default',
-			'auto_init_gnrc_netif',
-			'gnrc_sock_udp',
-			'emcute',
-			'shell',
-			'shell_commands',
-			'gnrc_ipv6_default',
-			'gnrc_icmpv6_echo'
+		"app_name": "MQTTSN_RIOT",
+		"board_name": "native",
+		"directory": "$(CURDIR)/..",
+		"package": [
+			"gnrc_netdev_default",
+			"auto_init_gnrc_netif",
+			"gnrc_sock_udp",
+			"emcute",
+			"shell",
+			"shell_commands",
+			"gnrc_ipv6_default",
+			"gnrc_icmpv6_echo"
 		],
-		'emcute_id' : 'CFLAGS += -DEMCUTE_ID=\$(EMCUTE_ID)\',
-		'devhelp' : 'DEVELHELP += 1',
-		'quiet' : 'QUIET += 1'
+		"emcute_id" : "CFLAGS += -DEMCUTE_ID=\$(EMCUTE_ID)\",
+		"devhelp" : "DEVELHELP += 1",
+		"quiet" : "QUIET += 1"
 	};
