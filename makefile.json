@@ -14,4 +14,4 @@
 		'emcute_id' : 'CFLAGS += -DEMCUTE_ID=\"$(EMCUTE_ID)\"',
 		'devhelp' : 'DEVELHELP += 1',
 		'quiet' : 'QUIET += 1'
-	};
+};
