@@ -1,29 +1,44 @@
 {
-'buffer': [
+	"header": [
+			{"h_name": "<stdio.h>"},
+			{"h_name": "<string.h>"},
+			{"h_name": "<stdlib.h>"},
+			{"h_name": "<random.h>"},
+			{"h_name": ""shell.h""},
+			{"h_name" : ""msg.h""},
+			{"h_name": ""net/emcute.h""},
+			{"h_name": ""net/ipv6/addr.h""}
+		],
+		"directive" : [
+			{ "var" : "EMCUTE_ID" ,
+			  "value" : "("getrud")"
+			},
+		],
+	"buffer": [
 			{
-			'keyword' : 'static',
-			'datatype' : 'char',
-			'var' : 'stack',
-			'size' : 'THREAD_STACKSIZE_DEFAULT',
+			"keyword" : "static",
+			"datatype" : "char",
+			"var" : "stack",
+			"size" : "THREAD_STACKSIZE_DEFAULT",
 			} ,
 			{
-				'keyword' : 'static',
-				'datatype' : 'msg_t',
-				'var':'queue',
-				'size': '8',
+				"keyword" : "static",
+				"datatype" : "msg_t",
+				"var":"queue",
+				"size": "8",
 			},
 			{
-				'keyword' : 'static',
-				'datatype' : 'emcute_sub_t',
-				'var':'subscriptions',
-				'size': 'NUMOFSUBS',
+				"keyword" : "static",
+				"datatype" : "emcute_sub_t",
+				"var":"subscriptions",
+				"size": "NUMOFSUBS",
 			},
 			{
-				'keyword' : 'static',
-				'datatype' : 'char',
-				'var':'topics',
-				'size': 'NUMOFSUBS',
-				'size2' : 'TOPIC_MAXLEN'
+				"keyword" : "static",
+				"datatype" : "char",
+				"var":"topics",
+				"size": "NUMOFSUBS",
+				"size2" : "TOPIC_MAXLEN"
 			},
 		]
 };
