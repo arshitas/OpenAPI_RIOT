@@ -1,7 +1,15 @@
 {{!this template will generate the main.c file}}
 
+{{#header}}
+#include {{ h_name }}
+{{/header}}
+
+{{#directive}}
+#define {{var}}       {{value}}
+{{/directive}}
+
 {{#buffer}}
-		{{keyword}} {{datatype}} {{var}}[{{size}}]{{#size2}}[{{size2}}]{{/size2}} ;
+{{keyword}} {{datatype}} {{var}}[{{size}}]{{#size2}}[{{size2}}]{{/size2}} ;
 {{/buffer}}
 
 
