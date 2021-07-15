@@ -1,0 +1,29 @@
+{
+'buffer': [
+			{
+			'keyword' : 'static',
+			'datatype' : 'char',
+			'var' : 'stack',
+			'size' : 'THREAD_STACKSIZE_DEFAULT',
+			} ,
+			{
+				'keyword' : 'static',
+				'datatype' : 'msg_t',
+				'var':'queue',
+				'size': '8',
+			},
+			{
+				'keyword' : 'static',
+				'datatype' : 'emcute_sub_t',
+				'var':'subscriptions',
+				'size': 'NUMOFSUBS',
+			},
+			{
+				'keyword' : 'static',
+				'datatype' : 'char',
+				'var':'topics',
+				'size': 'NUMOFSUBS',
+				'size2' : 'TOPIC_MAXLEN'
+			},
+		]
+};
