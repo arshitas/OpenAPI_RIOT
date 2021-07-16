@@ -23,3 +23,17 @@ USEMODULE += {{.}}
  
 {{!the last line is constant in all RIOT makefiles so I did not mention any tags here}}
 include $(RIOTBASE)/Makefile.include
+
+{{#basic}}
+{{name}} {{operator}} {{value}}
+{{/basic}}
+
+{{#module}}
+USEMODULE += {{.}}
+{{/module}}
+
+{{#object_id}}
+ifneq (,$({{{object_id}}}))
+  CFLAGS += -DEMCUTE_ID=\"$({{object_id}})\"
+endif
+{{/object_id}}
