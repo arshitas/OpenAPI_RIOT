@@ -14,5 +14,23 @@
 		],
 		"emcute_id" : "CFLAGS += -DEMCUTE_ID=(EMCUTE_ID)",
 		"devhelp" : "DEVELHELP+=1",
-		"quiet" : "QUIET+=1"
+		"quiet" : "QUIET+=1" , 
+	"basic" : [
+    {
+      "name" : "APPLICATION",
+      "operator" : "=",
+      "value" : "mqttsn_with_riot"
+    },
+    {
+      "name" : "BOARD",
+      "operator" : "?=",
+      "value" : "native"
+    },
+    {
+      "name" : "RIOTBASE",
+      "operator" : "?=",
+      "value" : "$(CURDIR)/.."
+    }
+    
+    ],
 	};
