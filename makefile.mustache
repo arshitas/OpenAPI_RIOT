@@ -1,39 +1,23 @@
-{{!returns the exact makelfile when combined with makefile.json}}
+{{!This mustache template return Makefile for RIOT}}
+{{!The application name is global variable as it is defined specifically}}
+APPLICATION = {{app_name}}
 
+{{!The macros tag contains name of the macro and its value which can be overrided}}
+{{#macros}}
+{{name}} ?= {{value}}
+{{/macros}}
 
-{{!instead of defining application, board and riotbase directly, we can add an operation class}}
-{{!the operation class  will have three instances: application, board_name, riotbase}}
-APPLICATION =  {{ app_name }}
-
-BOARD?= {{board_name}}
-
-RIOTBASE  ?= {{directory}}
-
-{{ #package }}{{!includes the required packages as mentioned in the json file}} 
-USEMODULE += {{.}}
-{{/package}}
-
-{{!emcute_id is needed from the main.c file. I am not sure if this is the right way}}
-{{#emcute_id}} {{{emcute_id}}} {{/emcute_id}}
-
-{{! the develhelp and quiet values in RIOT are partials so these are used when specifically mentioned}}
-{{#devhelp}} {{{devhelp}}} {{/devhelp}}
-
-{{#quiet}} {{{quiet}}} {{/quiet}}
- 
-{{!the last line is constant in all RIOT makefiles so I did not mention any tags here}}
-include $(RIOTBASE)/Makefile.include
-
-{{#basic}}
-{{name}} {{operator}} {{value}}
-{{/basic}}
-
+{{!All the modules used in programs are mentioned in module tag}}
 {{#module}}
 USEMODULE += {{.}}
 {{/module}}
 
-{{#object_id}}
-ifneq (,$({{{object_id}}}))
-  CFLAGS += -DEMCUTE_ID=\"$({{object_id}})\"
+{{!conditional tag implements generalised version of conditions used in Makefile}} 
+{{#conditional}}
+{{condition}} ({{var1}},{{var2}})
+{{name}} += {{value}}
 endif
-{{/object_id}}
+{{/conditional}}
+
+{{!no changes in the last line as it constant}}
+include $(RIOTBASE)/Makefile.include
