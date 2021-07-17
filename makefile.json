@@ -1,8 +1,28 @@
 {
-		"app_name": "MQTTSN_RIOT",
-		"board_name": "native",
-		"directory": "$(CURDIR)/..",
-		"package": [
+  "app_name" : "mqttsn_riot",
+  
+  "macros" : [
+    
+    {
+      "name" : "BOARD",
+      "value" : "native"
+    },
+    {
+      "name" : "RIOTBASE",
+      "value" : "$(CURDIR)/.."
+    },
+    {
+      "name" : "DEVELHELP",
+      "value" : "1"
+    },
+    {
+      "name" : "QUIET",
+      "value": "1"
+    }
+    
+    ],
+      
+    "module": [
 			"gnrc_netdev_default",
 			"auto_init_gnrc_netif",
 			"gnrc_sock_udp",
@@ -12,25 +32,14 @@
 			"gnrc_ipv6_default",
 			"gnrc_icmpv6_echo"
 		],
-		"emcute_id" : "CFLAGS += -DEMCUTE_ID=(EMCUTE_ID)",
-		"devhelp" : "DEVELHELP+=1",
-		"quiet" : "QUIET+=1" , 
-	"basic" : [
-    {
-      "name" : "APPLICATION",
-      "operator" : "=",
-      "value" : "mqttsn_with_riot"
-    },
-    {
-      "name" : "BOARD",
-      "operator" : "?=",
-      "value" : "native"
-    },
-    {
-      "name" : "RIOTBASE",
-      "operator" : "?=",
-      "value" : "$(CURDIR)/.."
-    }
-    
-    ],
-	};
+      
+      "conditional" : 
+        {
+          "condition" : "ifneq",
+          "var1" : "",
+          "var2" : "$(EMCUTE_ID)",
+          "name" : "CFLAGS",
+          "value" : "-DEMCUTE_ID=\"$(EMCUTE_ID)\""
+        }
+
+};
