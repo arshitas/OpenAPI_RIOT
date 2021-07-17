@@ -1,44 +1,64 @@
 {
 	"header": [
-			{"h_name": "<stdio.h>"},
-			{"h_name": "<string.h>"},
-			{"h_name": "<stdlib.h>"},
-			{"h_name": "<random.h>"},
-			{"h_name": ""shell.h""},
-			{"h_name" : ""msg.h""},
-			{"h_name": ""net/emcute.h""},
-			{"h_name": ""net/ipv6/addr.h""}
-		],
-		"directive" : [
-			{ "var" : "EMCUTE_ID" ,
-			  "value" : "("getrud")"
-			},
-		],
-	"buffer": [
-			{
-			"keyword" : "static",
-			"datatype" : "char",
-			"var" : "stack",
-			"size" : "THREAD_STACKSIZE_DEFAULT",
-			} ,
-			{
-				"keyword" : "static",
-				"datatype" : "msg_t",
-				"var":"queue",
-				"size": "8",
-			},
-			{
-				"keyword" : "static",
-				"datatype" : "emcute_sub_t",
-				"var":"subscriptions",
-				"size": "NUMOFSUBS",
-			},
-			{
-				"keyword" : "static",
-				"datatype" : "char",
-				"var":"topics",
-				"size": "NUMOFSUBS",
-				"size2" : "TOPIC_MAXLEN"
-			},
-		]
-};
+    "stdio.h",
+    "string.h",
+    "stdlib.h",
+    "random.h",
+    "shell.h",
+    "msg.h",
+    "net/emcute.h",
+    "net/ipv6/addr.h"
+    ],
+      "directive" : [
+        {
+          "condition" : "ifndef",
+          "var" : "EMCUTE_ID",
+          "value" : "getrude"
+        },
+        {
+          "var" : "EMCUTE_PORT",
+          "value" : "1883U"
+        }, 
+        {
+         "var" : "EMCUTE_PRIO",
+         "value": "THREAD_PRIORITY_MAIN -1"
+        }, 
+        {
+          "var" : "NUMOFSUBS",
+          "value" : "16U"
+        }, 
+        {
+          "var" : "TOPIC_MAXLEN",
+          "value" : "64U"
+        }
+        ],
+      
+      "buffer": [
+			
+        {
+          "keyword" : "static",
+          "datatype" : "char",
+          "var" : "stack",
+          "size" : "THREAD_STACKSIZE_DEFAULT"
+        },
+        {
+          "keyword" : "static",
+          "datatype" : "msg_t",
+          "var":"queue",
+          "size": "8"
+        },
+        {
+          "keyword" : "static",
+          "datatype" : "emcute_sub_t",
+          "var":"subscriptions",
+          "size": "NUMOFSUBS"
+        },
+        {
+          "keyword" : "static",
+          "datatype" : "char",
+          "var": "topics",
+          "size": "NUMOFSUBS",
+          "size2" : "TOPIC_MAXLEN"
+        }
+      ]  
+}
