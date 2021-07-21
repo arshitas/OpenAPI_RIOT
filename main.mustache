@@ -26,12 +26,17 @@
 {{>additionalFunctions}}
 
 {{#operations}}
-{{#operation}}
+{{#operation}} {{!operation corresponds to functions, operationId is the name of the function, additionalParams are the variables which are defined within the function}}
 static {{returnType}} {{operationId}} ( int argc, char **argv )
 {
   {{#additionalParams}}
   {{type}} {{name}} {{#value}}={{value}} {{/value}} ;
   {{/additionalParams}}
+   
+  {{! this is incomplete, a lot more stuff will be added here}}
+}
+{{/operation}}
+{{/operations}}
   
   
 
