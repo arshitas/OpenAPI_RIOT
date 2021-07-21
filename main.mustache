@@ -1,9 +1,12 @@
 {{!this template will generate the main.c file}}
 
+
+{{!the header tag includes all the header files used in the C code}}
 {{#header}}
 #include <{{.}}>
 {{/header}}
 
+{{!values which are defined using prerocessor directives are included in the directive tag}}
 {{#directive}}
     {{#condition}}
 #{{condition}} {{var}}
@@ -14,7 +17,54 @@
     {{/condition}}
 {{/directive}}
 
+{{!buffer tag is used for buffers which are definined globally}}
 {{#buffer}}
 {{keyword}} {{datatype}} {{var}}[{{size}}]{{#size2}}[{{size2}}]{{/size2}} ;
 {{/buffer}}
 
+{{!the functions which are not a part of shell_commands will be included in the additionalFunctions mustache file}}
+{{>additionalFunctions}}
+
+{{#operations}}
+{{#operation}}
+static {{returnType}} {{operationId}} ( int argc, char **argv )
+{
+  {{#additionalParams}}
+  {{type}} {{name}} {{#value}}={{value}} {{/value}} ;
+  {{/additionalParams}}
+  
+  
+
+
+{{!shellCommands is a list of commands and its associate description and operationId which are part of shell}}
+static const shell_commands_t shell_commands[] = {
+{{#shellCommands}}
+{ "{{command}}","{{desc}}","{{operationId}}" },
+{{/shellCommands}}
+{NULL,NULL,NULL}
+};
+
+{{!only the name of buffers will change in the main() . I couldn.t figure it out now so I have kept it same}}
+int main(void)
+{
+    puts("MQTT-SN IoT application\n");
+    puts("Type 'help' to get started. Have a look at the README.md for more"
+         "information.");
+
+    /* the main thread needs a msg queue to be able to run `ping6`*/
+    msg_init_queue(queue, ARRAY_SIZE(queue));
+
+    /* initialize our subscription buffers */
+    memset(subscriptions, 0, (NUMOFSUBS * sizeof(emcute_sub_t)));
+
+    /* start the emcute thread */
+    thread_create(stack, sizeof(stack), EMCUTE_PRIO, 0,
+                  emcute_thread, NULL, "emcute");
+
+    /* start shell */
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+
+    /* should be never reached */
+    return 0;
+}
