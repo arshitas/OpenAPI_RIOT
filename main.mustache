@@ -7,33 +7,58 @@
 {{/header}}
 
 {{!values which are defined using prerocessor directives are included in the directive tag}}
-{{#directive}}
-    {{#condition}}
+{{#directive}}{{#condition}}
 #{{condition}} {{var}}
 #define {{var}}       ({{value}})
 #endif {{/condition}}
     {{^condition}}
 #define {{var}}      ({{value}})
-    {{/condition}}
-{{/directive}}
+{{/condition}}{{/directive}}
 
 {{!buffer tag is used for buffers which are definined globally}}
 {{#buffer}}
-{{keyword}} {{datatype}} {{var}}[{{size}}]{{#size2}}[{{size2}}]{{/size2}} ;
+static {{type}} {{.}}[{{size}}]{{#size2}}[{{size2}}]{{/size2}} ;
 {{/buffer}}
-
-{{!the functions which are not a part of shell_commands will be included in the additionalFunctions mustache file}}
-{{>additionalFunctions}}
 
 {{#operations}}
 {{#operation}} {{!operation corresponds to functions, operationId is the name of the function, additionalParams are the variables which are defined within the function}}
-static {{returnType}} {{operationId}} ( int argc, char **argv )
+static {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}void{{/returnType}} {{operationId}}({{#params}}{{dataType}} {{paramName}}{{^last}},{{/last}}{{/params}})
 {
-  {{#additionalParams}}
-  {{type}} {{name}} {{#value}}={{value}} {{/value}} ;
-  {{/additionalParams}}
+  {{summary}}
+  
+  {{#emcute_thread}}
+  (void){{paramName}};
+  
+  emcute_run({{#directive}}{{EMCUTE_PORT}},{{EMCUTE_ID}}{{/directive}});
+  return NULL;
+  {{/emcute_thread}}
+  
+  {{#on_pub}}
+  char *in = (char *)data;
+
+    printf("### got publication for topic '%s' [%i] ###\n",
+           {{#buffer}}{{topic}}->name, (int){{topic}}->id{{/buffer}});
+    for (size_t i = 0; i < len; i++) {
+        printf("%c", in[i]);
+    }
+    puts("");
+    {{/on_pub}}
+    
+    {{#get_qos}}
+    int qos= atoi({{paramName}});
+    switch (qos) {
+        case 1:     return EMCUTE_QOS_1;
+        case 2:     return EMCUTE_QOS_2;
+        default:    return EMCUTE_QOS_0;
+    }
+    {{/get_qos}}
+    
+    {{
    
-  {{! this is incomplete, a lot more stuff will be added here}}
+  
+  
+   
+  
 }
 {{/operation}}
 {{/operations}}
@@ -55,17 +80,20 @@ int main(void)
     puts("MQTT-SN IoT application\n");
     puts("Type 'help' to get started. Have a look at the README.md for more"
          "information.");
-
+    {{#buffer}}{{#queue}}
     /* the main thread needs a msg queue to be able to run `ping6`*/
     msg_init_queue(queue, ARRAY_SIZE(queue));
-
+    {{/queue}}
+     {{#subscriptions}}
     /* initialize our subscription buffers */
     memset(subscriptions, 0, (NUMOFSUBS * sizeof(emcute_sub_t)));
-
+    {{/subscriptions}}
+    {{#stack}}
     /* start the emcute thread */
     thread_create(stack, sizeof(stack), EMCUTE_PRIO, 0,
                   emcute_thread, NULL, "emcute");
-
+    {{/stack}}{{/buffer}}
+    
     /* start shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
