@@ -1,7 +1,7 @@
 {{!additionalFunctions mustache file}}
 {{!this file will contain definition for emcute thread , on_pub , get_qos functions}}
 
-{{operations}}{{#operation}}
+{{#operation}}
 {{#emcute_thread}}
     (void){{parameter1}};
     emcute_run({{#directives}}{{emcute_port}},{{emcuteId}}{{/directives}});
@@ -27,5 +27,5 @@
         default:    return EMCUTE_QOS_0;
     }
 {{/get_qos}}
-{{/operation}}{{/operations}}
+{{/operation}}
   
