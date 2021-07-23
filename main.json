@@ -112,6 +112,33 @@
             "parameter2" : "argv",
             "will" : "True"
           }
-          ]
+          ],
+  "shellCommands" : [
+    {
+      "command" : "con",
+      "description" : "connect to MQTT broker",
+      "operationId" : "cmd_con"
+    },
+    { "command" : "discon", 
+     "description" : "disconnect from the current broker",
+     "operationId" : "cmd_discon" 
+    },
+    { "command" : "pub", 
+     "description" : "publish something", 
+     "operationId" : "cmd_pub" 
+    },
+    { "command" : "sub", 
+     "description" :"subscribe topic",
+     "operationId" :"cmd_sub" 
+    },
+    { "command" : "unsub",
+     "description" :"unsubscribe from topic",
+     "operationId" : "cmd_unsub" 
+    },
+    { "command" :"will",
+     "description" :"register a last will",
+     "operationId" : "cmd_will"
+    }
+    ]
           
 }
