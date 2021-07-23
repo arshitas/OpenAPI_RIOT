@@ -1,3 +1,31 @@
 {{!additionalFunctions mustache file}}
+{{!this file will contain definition for emcute thread , on_pub , get_qos functions}}
 
-{{tnis file will contain definition for emcute thread , on_pub , get_qos functions}}
+{{operations}}{{#operation}}
+{{#emcute_thread}}
+    (void){{parameter1}};
+    emcute_run({{#directives}}{{emcute_port}},{{emcuteId}}{{/directives}});
+    return NULL;
+{{/emcute_thread}}
+
+{{#on_pub}}
+    char *in = (char *){{parameter2}};
+
+    printf("### got publication for topic '%s' [%i] ###\n",
+           {{parameter1}}->name, (int){{parameter1}}->id);
+    for (size_t i = 0; i <{{parameter3}}; i++) {
+        printf("%c", in[i]);
+    }
+    puts("");
+{{/on_pub}}
+
+{{#get_qos}}
+    int qos = atoi({{parameter1}});
+    switch (qos) {
+        case 1:     return EMCUTE_QOS_1;
+        case 2:     return EMCUTE_QOS_2;
+        default:    return EMCUTE_QOS_0;
+    }
+{{/get_qos}}
+{{/operation}}{{/operations}}
+  
