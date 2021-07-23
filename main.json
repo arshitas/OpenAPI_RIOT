@@ -1,5 +1,5 @@
 {
-	"header": [
+  "header": [
     "stdio.h",
     "string.h",
     "stdlib.h",
@@ -9,28 +9,12 @@
     "net/emcute.h",
     "net/ipv6/addr.h"
     ],
-      "directive" : [
-        {
-          "condition" : "ifndef",
-          "var" : "EMCUTE_ID",
-          "value" : "getrude"
-        },
-        {
-          "var" : "EMCUTE_PORT",
-          "value" : "1883U"
-        }, 
-        {
-         "var" : "EMCUTE_PRIO",
-         "value": "THREAD_PRIORITY_MAIN -1"
-        }, 
-        {
-          "var" : "NUMOFSUBS",
-          "value" : "16U"
-        }, 
-        {
-          "var" : "TOPIC_MAXLEN",
-          "value" : "64U"
-        }
+       "directive" : [
+         { "emcuteId" : "gertrud"},
+         {"emcutePort" : "1883U" },
+         {"emcutePrio" : "THREAD_PRIORITY_MAIN - 1"},
+         {"numOfSubs" : "16U"},
+         {"topicMaxlen" : "64U"}
         ],
       
       "buffer" : [
@@ -38,5 +22,96 @@
     {"stack" : "THREAD_STACKSIZE_DEFAULT"},
     {"subscriptions" : "NUMOFSUBS" },
     {"topic" : "TOPIC_MAXLEN" }
-    ] 
+    ],
+        "operation" : [
+          {
+            "returnType" : "void *",
+            "summary" : "runs the emcute thread",
+            "operationId" : "emcute_thread",
+            "parameter1" : "arg",
+            "type1" : "void *",
+            "emcute_thread" : "True"
+          },
+          {
+            "operationId" : "on_pub",
+            "type1" : "const emcute_topic_t *",
+            "summary" : "public message",
+            "parameter1" : "topic",
+            "type2" : "void *",
+            "parameter2" : "data",
+            "type3" : "size_t " ,
+            "parameter3" : "len",
+            "on_pub" : "True"
+          },
+          {
+            "operationId" : "get_qos",
+            "returnType" : "unsigned",
+            "summary" : "return qos value",
+            "type1" : "const char *",
+            "parameter1" : "str",
+            "get_qos" : "True"
+            
+          },
+          {
+            "operationId" : "cmd_discon",
+            "summary" : "Disconnect from broker",
+            "returnType" : "int",
+            "type1": "int ",
+            "parameter1" : "argc",
+            "type2" : "char **",
+            "parameter2" : "argv",
+            "discon" : "True"
+          },
+          {
+            "operationId" : "cmd_con",
+            "returnType" : "int ",
+            "summary" :"connect to broker",
+            "type1": "int ",
+            "parameter1" : "argc",
+            "type2" : "char **",
+            "parameter2" : "argv",
+            "con" : "True"
+          },
+          {
+            "operationId" : "cmd_pub",
+            "summary" : "Publish a message in topic",
+            "returnType" : "int ",
+            "type1": "int ",
+            "parameter1" : "argc",
+            "type2" : "char **",
+            "parameter2" : "argv",
+            "pub" : "True"
+          },
+          {
+            "operationId" : "cmd_sub",
+            "returnType" : "int ",
+            "summary" : "subscribe to topic",
+            "type1": "int ",
+            "parameter1" : "argc",
+            "type2" : "char **",
+            "parameter2" : "argv",
+            "sub" : "True"
+          },
+          {
+            "operationId" : "cmd_unsub",
+            "summary" : "unsubscribe to topic",
+            "returnType" : "int ",
+            "type1": "int ",
+            "parameter1" : "argc",
+            "type2" : "char **",
+            "parameter2" : "argv",
+            "unsub" : "True"
+          },
+          {
+            "operationId" : "cmd_will",
+            "summary" : "update last will",
+            "returnType" : "int ",
+            "type1": "int ",
+            "parameter1" : "argc",
+            "type2" : "char **",
+            "parameter2" : "argv",
+            "will" : "True"
+          }
+          ]
+          
 }
