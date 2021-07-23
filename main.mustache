@@ -1,80 +1,197 @@
-{{!this template will generate the main.c file}}
-
-
-{{!the header tag includes all the header files used in the C code}}
+{{!this template will define main.c}}
+{{!includes the header files required}}
 {{#header}}
 #include <{{.}}>
 {{/header}}
 
+{{!includes preprocessor values}}
 {{!values which are defined using prerocessor directives are included in the directive tag}}
-{{#directive}}{{#condition}}
-#{{condition}} {{var}}
-#define {{var}}       ({{value}})
-#endif {{/condition}}
-    {{^condition}}
-#define {{var}}      ({{value}})
-{{/condition}}{{/directive}}
+{{#directive}}{{#emcuteId}}#define EMCUTE_ID     ({{emcuteId}}){{/emcuteId}}
+{{#emcutePort}}#define EMCUTE_PORT   ({{emcutePort}}){{/emcutePort}}
+{{#emcutePrio}}#define EMCUTE_PRIO   ({{emcutePrio}}){{/emcutePrio}}
+{{#numOfSubs}}#define NUMOFSUBS      ({{numOfSubs}}){{/numOfSubs}}
+{{#topicMaxlen}}#define TOPIC_MAXLEN  ({{topicMaxlen}}){{/topicMaxlen}}
+{{/directive}}
 
-{{!buffer tag is used for buffers which are definined globally}}
+{{!buffer tag will have values from the directives}}
 {{#buffer}}
-static {{type}} {{.}}[{{size}}]{{#size2}}[{{size2}}]{{/size2}} ;
+{{#queue}}static msg_t queue[{{queue}}];{{/queue}}
+{{#stack}}static char stack[{{stack}}];{{/stack}}
+{{#subscriptions}}static emcute_sub_t subscriptions[{{subscriptions}}];{{/subscriptions}}
+{{#topic}}static char topics[{{#buffer}}{{subscriptions}}{{/buffer}}][{{topic}}];{{/topic}}
 {{/buffer}}
 
-{{#operations}}
-{{#operation}} {{!operation corresponds to functions, operationId is the name of the function, additionalParams are the variables which are defined within the function}}
-static {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}void{{/returnType}} {{operationId}}({{#params}}{{dataType}} {{paramName}}{{^last}},{{/last}}{{/params}})
+{{!operation tag defines functions of the program}}
+{{#operation}}
+static {{#returnType}}{{returnType}} {{/returnType}}{{^returnType}}void {{/returnType}}{{operationId}}({{type1}}{{parameter1}}{{#parameter2}}, {{type2}}{{parameter2}}{{/parameter2}}{{#parameter3}}, {{type3}}{{parameter3}}{{/parameter3}})
 {
-  {{summary}}
-  
-  {{#emcute_thread}}
-  (void){{paramName}};
-  
-  emcute_run({{#directive}}{{EMCUTE_PORT}},{{EMCUTE_ID}}{{/directive}});
-  return NULL;
-  {{/emcute_thread}}
-  
-  {{#on_pub}}
-  char *in = (char *)data;
+  //{{summary}}
+{{#emcute_thread}}{{>additionalFunctions}}{{/emcute_thread}}
+{{#on_pub}}{{>additionalFunctions}}{{/on_pub}}
+{{#get_qos}}{{>additionalFunctions}}{{/get_qos}}
+{{#con}}
+    sock_udp_ep_t gw = { .family = AF_INET6, .port = EMCUTE_PORT };
+    char *topic = NULL;
+    char *message = NULL;
+    size_t len = 0;
 
-    printf("### got publication for topic '%s' [%i] ###\n",
-           {{#buffer}}{{topic}}->name, (int){{topic}}->id{{/buffer}});
-    for (size_t i = 0; i < len; i++) {
-        printf("%c", in[i]);
+    if ({{parameter1}} < 2) {
+        printf("usage: %s <ipv6 addr> [port] [<will topic> <will message>]\n",
+                {{parameter2}}[0]);
+        return 1;
     }
-    puts("");
-    {{/on_pub}}
-    
-    {{#get_qos}}
-    int qos= atoi({{paramName}});
-    switch (qos) {
-        case 1:     return EMCUTE_QOS_1;
-        case 2:     return EMCUTE_QOS_2;
-        default:    return EMCUTE_QOS_0;
+
+    /* parse address */
+    if (ipv6_addr_from_str((ipv6_addr_t *)&gw.addr.ipv6, {{parameter2}}[1]) == NULL) {
+        printf("error parsing IPv6 address\n");
+        return 1;
     }
-    {{/get_qos}}
-    
-    {{
-   
-  
-  
-   
-  
+
+    if ({{parameter1}} >= 3) {
+        gw.port = atoi({{parameter2}}[2]);
+    }
+    if ({{parameter2}}>= 5) {
+        topic = {{parameter2}}[3];
+        message = {{parameter2}}[4];
+        len = strlen(message);
+    }
+
+    if (emcute_con(&gw, true, topic, message, len, 0) != EMCUTE_OK) {
+        printf("error: unable to connect to [%s]:%i\n", {{parameter2}}[1], (int)gw.port);
+        return 1;
+    }
+    printf("Successfully connected to gateway at [%s]:%i\n",
+           {{parameter2}}[1], (int)gw.port);
+
+    return 0;
+{{/con}}{{#discon}}
+    (void){{parameter1}};
+    (void){{parameter2}};
+
+    int res = emcute_discon();
+    if (res == EMCUTE_NOGW) {
+        puts("error: not connected to any broker");
+        return 1;
+    }
+    else if (res != EMCUTE_OK) {
+        puts("error: unable to disconnect");
+        return 1;
+    }
+    puts("Disconnect successful");
+    return 0;
+{{/discon}}{{#pub}}
+    sock_udp_ep_t gw = { .family = AF_INET6, .port = EMCUTE_PORT };
+    char *topic = NULL;
+    char *message = NULL;
+    size_t len = 0;
+
+    if ({{parameter1}} < 2) {
+        printf("usage: %s <ipv6 addr> [port] [<will topic> <will message>]\n",
+                {{parameter2}}[0]);
+        return 1;
+    }
+
+    /* parse address */
+    if (ipv6_addr_from_str((ipv6_addr_t *)&gw.addr.ipv6, {{parameter2}}[1]) == NULL) {
+        printf("error parsing IPv6 address\n");
+        return 1;
+    }
+
+    if ({{parameter1}} >= 3) {
+        gw.port = atoi({{{{parameter2}}[2]);
+    }
+    if ({{parameter1}} >= 5) {
+        topic = {{parameter2}}[3];
+        message = {{parameter2}}[4];
+        len = strlen(message);
+    }
+
+    if (emcute_con(&gw, true, topic, message, len, 0) != EMCUTE_OK) {
+        printf("error: unable to connect to [%s]:%i\n", {{parameter2}}[1], (int)gw.port);
+        return 1;
+    }
+    printf("Successfully connected to gateway at [%s]:%i\n",
+           {{parameter2}}[1], (int)gw.port);
+
+    return 0;
+{{/pub}}{{#sub}}
+unsigned flags = EMCUTE_QOS_0;
+
+    if ({{parameter1}} < 2) {
+        printf("usage: %s <topic name> [QoS level]\n", {{parameter2}}[0]);
+        return 1;
+    }
+
+    if (strlen({{parameter2}}[1]) > TOPIC_MAXLEN) {
+        puts("error: topic name exceeds maximum possible size");
+        return 1;
+    }
+    if ({{parameter1}}>= 3) {
+        flags |= get_qos({{parameter2}}[2]);
+    }
+
+    /* find empty subscription slot */
+    unsigned i = 0;
+    for (; (i < NUMOFSUBS) && (subscriptions[i].topic.id != 0); i++) {}
+    if (i == NUMOFSUBS) {
+        puts("error: no memory to store new subscriptions");
+        return 1;
+    }
+
+    subscriptions[i].cb = on_pub;
+    strcpy(topics[i], {{parameter2}}[1]);
+    subscriptions[i].topic.name = topics[i];
+    if (emcute_sub(&subscriptions[i], flags) != EMCUTE_OK) {
+        printf("error: unable to subscribe to %s\n", {{parameter2}}[1]);
+        return 1;
+    }
+
+    printf("Now subscribed to %s\n", {{parameter2}}[1]);
+    return 0;
+
+{{/sub}}{{#unsub}}
+if ({{parameter1}} < 2) {
+        printf("usage %s <topic name>\n", {{parameter2}}[0]);
+        return 1;
+    }
+
+    /* find subscriptions entry */
+    for (unsigned i = 0; i < NUMOFSUBS; i++) {
+        if (subscriptions[i].topic.name &&
+            (strcmp(subscriptions[i].topic.name, {{parameter2}}[1]) == 0)) {
+            if (emcute_unsub(&subscriptions[i]) == EMCUTE_OK) {
+                memset(&subscriptions[i], 0, sizeof(emcute_sub_t));
+                printf("Unsubscribed from '%s'\n", {{parameter2}}[1]);
+            }
+            else {
+                printf("Unsubscription form '%s' failed\n", {{parameter2}}[1]);
+            }
+            return 0;
+        }
+    }
+
+    printf("error: no subscription for topic '%s' found\n", {{parameter2}}[1]);
+    return 1;
+{{/unsub}}{{#will}}
+if ({{parameter1}} < 3) {
+        printf("usage %s <will topic name> <will message content>\n", {{parameter2}}[0]);
+        return 1;
+    }
+
+    if (emcute_willupd_topic({{parameter2}}[1], 0) != EMCUTE_OK) {
+        puts("error: unable to update the last will topic");
+        return 1;
+    }
+    if (emcute_willupd_msg({{parameter2}}[2], strlen({{parameter2}}[2])) != EMCUTE_OK) {
+        puts("error: unable to update the last will message");
+        return 1;
+    }
+
+    puts("Successfully updated last will topic and message");
+    return 0;
+{{/will}}
 }
 {{/operation}}
-{{/operations}}
-  
-  
-
-
-{{!shellCommands is a list of commands and its associate description and operationId which are part of shell}}
-static const shell_commands_t shell_commands[] = {
-{{#shellCommands}}
-{ "{{command}}","{{desc}}","{{operationId}}" },
-{{/shellCommands}}
-{NULL,NULL,NULL}
-};
-
-{{!only the name of buffers will change in the main() . I couldn.t figure it out now so I have kept it same}}
 int main(void)
 {
     puts("MQTT-SN IoT application\n");
