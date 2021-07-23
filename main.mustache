@@ -192,9 +192,11 @@ if ({{parameter1}} < 3) {
 {{/will}}
 }
 {{/operation}}
-{{#shellCommands}}
+
 static const shell_command_t shell_command[] = {
-   {"{{command}}","{{decription}}","{{operationId}}" },
+{{#shellCommands}}
+   {"{{command}}","{{description}}","{{operationId}}" },
+{{/shellCommands}}
    { NULL, NULL, NULL}
 };
 int main(void)
