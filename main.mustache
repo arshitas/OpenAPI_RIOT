@@ -1,25 +1,47 @@
-{{!this template will define main.c}}
-{{!includes the header files required}}
-{{#header}}
-#include <{{.}}>
-{{/header}}
 
-{{!includes preprocessor values}}
-{{!values which are defined using prerocessor directives are included in the directive tag}}
-{{#directive}}{{#emcuteId}}#define EMCUTE_ID     ({{emcuteId}}){{/emcuteId}}
-{{#emcutePort}}#define EMCUTE_PORT   ({{emcutePort}}){{/emcutePort}}
-{{#emcutePrio}}#define EMCUTE_PRIO   ({{emcutePrio}}){{/emcutePrio}}
-{{#numOfSubs}}#define NUMOFSUBS      ({{numOfSubs}}){{/numOfSubs}}
-{{#topicMaxlen}}#define TOPIC_MAXLEN  ({{topicMaxlen}}){{/topicMaxlen}}
-{{/directive}}
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <random.h>
 
-{{!buffer tag will have values from the directives}}
-{{#buffer}}
-{{#queue}}static msg_t queue[{{queue}}];{{/queue}}
-{{#stack}}static char stack[{{stack}}];{{/stack}}
-{{#subscriptions}}static emcute_sub_t subscriptions[{{subscriptions}}];{{/subscriptions}}
-{{#topic}}static char topics[{{#buffer}}{{subscriptions}}{{/buffer}}][{{topic}}];{{/topic}}
-{{/buffer}}
+#include "shell.h"
+#include "msg.h"
+#include "net/emcute.h"
+#include "net/ipv6/addr.h"
+
+#ifndef EMCUTE_ID
+#define EMCUTE_ID           ("gertrud")
+#endif
+#define EMCUTE_PORT         (1883U)
+#define EMCUTE_PRIO         (THREAD_PRIORITY_MAIN - 1)
+
+#define NUMOFSUBS           (16U)
+#define TOPIC_MAXLEN        (64U)
+
+static char stack[THREAD_STACKSIZE_DEFAULT];
+static msg_t queue[8];
+
+static emcute_sub_t subscriptions[NUMOFSUBS];
+static char topics[NUMOFSUBS][TOPIC_MAXLEN];
+
+static void *emcute_thread(void *arg)
+{
+    (void)arg;
+    emcute_run(EMCUTE_PORT, EMCUTE_ID);
+    return NULL;    /* should never be reached */
+}
+
+static void on_pub(const emcute_topic_t *topic, void *data, size_t len)
+{
+    char *in = (char *)data;
+
+    printf("### got publication for topic '%s' [%i] ###\n",
+           topic->name, (int)topic->id);
+    for (size_t i = 0; i < len; i++) {
+        printf("%c", in[i]);
+    }
+    puts("");
+}
 
 {{!operation tag defines functions of the program}}
 {{#operation}}
@@ -225,3 +247,100 @@ int main(void)
     /* should be never reached */
     return 0;
 }
+
+
+
+
+
+static int cmd_con(void)
+{
+  sock_udp_ep_t gw = { .family = AF_INET6, .port = EMCUTE_PORT };
+  size_t len = 0;
+
+    /* parse address */
+    if (ipv6_addr_from_str((ipv6_addr_t *)&gw.addr.ipv6, {{server}}) == NULL) {
+        printf("error parsing IPv6 address\n");
+        return 1;
+    }
+
+
+    if (emcute_con(&gw, true, topic, message, len, 0) != EMCUTE_OK) {
+        printf("error: unable to connect to [%s]:%i\n",{{server}}, (int)gw.port);
+        return 1;
+    }
+    printf("Successfully connected to gateway at [%s]:%i\n",
+           {{server}}, (int)gw.port);
+
+    return 0;
+}
+{{#operation}}
+static int {{operationId}}(void)
+{
+   {{#server}}
+   {{/server}}
+  {{#isGet}}
+   if (strlen({{topic}}) > TOPIC_MAXLEN) {
+       puts("error: topic name exceeds maximum possible size");
+       return 1;
+   }
+   {{#qos}}
+   if (argc >= 3) {
+       flags |= get_qos({{qos}});
+   }{{/qos}}
+
+   /* find empty subscription slot */
+   unsigned i = 0;
+   for (; (i < NUMOFSUBS) && (subscriptions[i].topic.id != 0); i++) {}
+   if (i == NUMOFSUBS) {
+        puts("error: no memory to store new subscriptions");
+        return 1;
+    }
+
+    subscriptions[i].cb = on_pub;
+    strcpy(topics[i], {{topic}});
+    subscriptions[i].topic.name = topics[i];
+    if (emcute_sub(&subscriptions[i], flags) != EMCUTE_OK) {
+        printf("error: unable to subscribe to %s\n", {{topic}});
+        return 1;
+    }
+
+    printf("Now subscribed to %s\n",{{topic}});
+    return 0;
+
+    {{/isGet}}
+     
+    {{#isPut}}
+    emcute_topic_t t;
+    unsigned flags = EMCUTE_QOS_0;
+
+    /* parse QoS level */
+    {{#qos}}
+    if (argc >= 4) {
+        flags |= get_qos({{qos}});
+    }
+    {{/qos}}
+
+    printf("pub with topic: %s and name %s and flags 0x%02x\n",{{topic}},{{message}}, (int)flags);
+
+    /* step 1: get topic id */
+    t.name = {{topic}};
+    if (emcute_reg(&t) != EMCUTE_OK) {
+        puts("error: unable to obtain topic ID");
+        return 1;
+    }
+
+    /* step 2: publish data */
+    if (emcute_pub(&t, {{message}}, strlen({{message}}), flags) != EMCUTE_OK) {
+        printf("error: unable to publish data to topic '%s [%i]'\n",
+                t.name, (int)t.id);
+        return 1;
+    }
+
+    printf("Published %i bytes to topic '%s [%i]'\n",
+            (int)strlen({{message}}), t.name, t.id);
+
+    return 0;
+   {{/isPut}}
+}
+
+{{/operation}}
