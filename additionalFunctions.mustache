@@ -1,31 +1,25 @@
-{{!additionalFunctions mustache file}}
-{{!this file will contain definition for emcute thread , on_pub , get_qos functions}}
+{{!callback function}}
 
-{{#operation}}
-{{#emcute_thread}}
-    (void){{parameter1}};
-    emcute_run({{#directives}}{{emcute_port}},{{emcuteId}}{{/directives}});
-    return NULL;
-{{/emcute_thread}}
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <random.h>
 
-{{#on_pub}}
-    char *in = (char *){{parameter2}};
+#include "shell.h"
+#include "msg.h"
+#include "net/emcute.h"
+#include "net/ipv6/addr.h"
+
+{{#operations}}{{#operation}}{{isGet}}
+static void {{operationId}}_onPub(const emcute_topic_t *topic, void *data, size_t len)
+{
+    char *in = (char *)data;
 
     printf("### got publication for topic '%s' [%i] ###\n",
-           {{parameter1}}->name, (int){{parameter1}}->id);
-    for (size_t i = 0; i <{{parameter3}}; i++) {
+           {{topic}}->name, (int){{topic}}->id);
+    for (size_t i = 0; i < len; i++) {
         printf("%c", in[i]);
     }
     puts("");
-{{/on_pub}}
-
-{{#get_qos}}
-    int qos = atoi({{parameter1}});
-    switch (qos) {
-        case 1:     return EMCUTE_QOS_1;
-        case 2:     return EMCUTE_QOS_2;
-        default:    return EMCUTE_QOS_0;
-    }
-{{/get_qos}}
-{{/operation}}
-  
+}
+{{/isGet}}{{/operation}}{{/operations}}
