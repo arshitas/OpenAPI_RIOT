@@ -72,7 +72,7 @@ static int {{operationId}}(int argc, char** argv)
 }
 {{/server}}
    
-{{#isGet}}
+{{#isSubscribe}}
 static int {{operationId}}(int argc, char** argv)
 {
    (void)argc;
@@ -105,13 +105,14 @@ static int {{operationId}}(int argc, char** argv)
     printf("Now subscribed to %s\n",{{topic}});
     return 0;
 }
-{{/isGet}}
+{{/isSubscribe}}
 
-{{#isPut}}
+{{^isSubcribe}}
 static int {{operationId}}(int argc, char** argv)
 {
    (void)argc;
    (void)argv;
+   const void* buf;
     emcute_topic_t t;
     unsigned flags = EMCUTE_QOS_0;
 
@@ -132,7 +133,7 @@ static int {{operationId}}(int argc, char** argv)
     }
 
     /* step 2: publish data */
-    if (emcute_pub(&t, {{message}}, strlen({{message}}), flags) != EMCUTE_OK) {
+    if (emcute_pub(&t, buf, strlen(buf), flags) != EMCUTE_OK) {
         printf("error: unable to publish data to topic '%s [%i]'\n",
                 t.name, (int)t.id);
         return 1;
@@ -143,15 +144,8 @@ static int {{operationId}}(int argc, char** argv)
 
     return 0;
 }
-{{/isPut}}
+{{/isSubscribe}}
 {{/operation}}{{/operations}}
-
-static const shell_command_t shell_commands[] = {
-{{#operations}}{{#operation}}
-    { "{{operationId}}", NULL , {{operationId}} },
-{{/operation}}{{/operations}}
-    {NULL, NULL, NULL }
- }
  
  int main(void)
 {
@@ -168,11 +162,5 @@ static const shell_command_t shell_commands[] = {
     /* start the emcute thread */
     thread_create(stack, sizeof(stack), EMCUTE_PRIO, 0,
                   emcute_thread, NULL, "emcute");
-
-    /* start shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
-
-    /* should be never reached */
     return 0;
 }
