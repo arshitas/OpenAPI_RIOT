@@ -112,9 +112,9 @@ static int {{operationId}}(int argc, char** argv)
 {
    (void)argc;
    (void)argv;
-   const void* buf;
-    emcute_topic_t t;
-    unsigned flags = EMCUTE_QOS_0;
+   const void* buf=NULL;
+   emcute_topic_t t;
+   unsigned flags = EMCUTE_QOS_0;
 
     /* parse QoS level */
     {{#qos}}
@@ -123,7 +123,7 @@ static int {{operationId}}(int argc, char** argv)
     }
     {{/qos}}
 
-    printf("pub with topic: %s and name %s and flags 0x%02x\n",{{topic}},{{message}}, (int)flags);
+    printf("pub with topic: %s and name %s and flags 0x%02x\n",{{topic}}, buf, (int)flags);
 
     /* step 1: get topic id */
     t.name = {{topic}};
@@ -140,7 +140,7 @@ static int {{operationId}}(int argc, char** argv)
     }
 
     printf("Published %i bytes to topic '%s [%i]'\n",
-            (int)strlen({{message}}), t.name, t.id);
+            (int)strlen(buf), t.name, t.id);
 
     return 0;
 }
