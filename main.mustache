@@ -43,40 +43,35 @@ static unsigned get_qos(const char *str)
 
 {{>callback}}
 
-{{#operations}}{{#operation}} 
-{{#server}}
-static int {{operationId}}(int argc, char** argv)
+{{#brokerAddress}}
+static int connect (void)
 {
-   (void)argc;
-   (void)argv;
-   
    sock_udp_ep_t gw = { .family = AF_INET6, .port = EMCUTE_PORT };
    char *topic = NULL;
    char *message = NULL;
    size_t len = 0;
 
     /* parse address */
-    if (ipv6_addr_from_str((ipv6_addr_t *)&gw.addr.ipv6, {{server}} == NULL) {
+    if (ipv6_addr_from_str((ipv6_addr_t *)&gw.addr.ipv6, {{brokerAddress}} == NULL) {
         printf("error parsing IPv6 address\n");
         return 1;
     }
 
 
     if (emcute_con(&gw, true, topic, message, len, 0) != EMCUTE_OK) {
-        printf("error: unable to connect to [%s]:%i\n",{{server}}, (int)gw.port);
+        printf("error: unable to connect to [%s]:%i\n",{{brokerAddress}}, (int)gw.port);
         return 1;
     }
     printf("Successfully connected to gateway at [%s]:%i\n",
-        {{server}}, (int)gw.port);
+        {{brokerAddress}}, (int)gw.port);
     return 0;
 }
-{{/server}}
-   
+{{/brokerAdress}}
+
+{{#operations}}{{#operation}} 
 {{#isSubscribe}}
-static int {{operationId}}(int argc, char** argv)
+static int {{operationId}}(void)
 {
-   (void)argc;
-   (void)argv;
    if (strlen({{topic}}) > TOPIC_MAXLEN) {
        puts("error: topic name exceeds maximum possible size");
        return 1;
@@ -108,11 +103,8 @@ static int {{operationId}}(int argc, char** argv)
 {{/isSubscribe}}
 
 {{^isSubcribe}}
-static int {{operationId}}(int argc, char** argv)
+static int {{operationId}}(const void* buf)
 {
-   (void)argc;
-   (void)argv;
-   const void* buf=NULL;
    emcute_topic_t t;
    unsigned flags = EMCUTE_QOS_0;
 
