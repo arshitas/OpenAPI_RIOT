@@ -1,4 +1,4 @@
-{{#operations}}{{#operation}}{{#isGet}}
+{{#operations}}{{#operation}}{{#isSubscribe}}
 static void {{operationId}}_onPub(const emcute_topic_t *topic, void *data, size_t len)
 {
     char *in = (char *)data;
@@ -9,4 +9,4 @@ static void {{operationId}}_onPub(const emcute_topic_t *topic, void *data, size_
     }
     puts("");
 }
-{{/isGet}}{{/operation}}{{/operations}}
+{{/isSubscribe}}{{/operation}}{{/operations}}
