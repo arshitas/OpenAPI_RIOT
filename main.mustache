@@ -43,7 +43,6 @@ static unsigned get_qos(const char *str)
 
 {{>callback}}
 
-{{#brokerAddress}}
 static int connect (void)
 {
    sock_udp_ep_t gw = { .family = AF_INET6, .port = EMCUTE_PORT };
@@ -66,7 +65,7 @@ static int connect (void)
         {{brokerAddress}}, (int)gw.port);
     return 0;
 }
-{{/brokerAdress}}
+
 
 {{#operations}}{{#operation}} 
 {{#isSubscribe}}
