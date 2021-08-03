@@ -43,7 +43,7 @@ static unsigned get_qos(const char *str)
 
 {{>callback}}
 
-static int connect (void)
+static void connect (void)
 {
    sock_udp_ep_t gw = { .family = AF_INET6, .port = EMCUTE_PORT };
    char *topic = NULL;
@@ -53,19 +53,31 @@ static int connect (void)
     /* parse address */
     if (ipv6_addr_from_str((ipv6_addr_t *)&gw.addr.ipv6, {{brokerAddress}} == NULL) {
         printf("error parsing IPv6 address\n");
-        return 1;
+        return ;
     }
 
 
     if (emcute_con(&gw, true, topic, message, len, 0) != EMCUTE_OK) {
         printf("error: unable to connect to [%s]:%i\n",{{brokerAddress}}, (int)gw.port);
-        return 1;
+        return ;
     }
     printf("Successfully connected to gateway at [%s]:%i\n",
         {{brokerAddress}}, (int)gw.port);
-    return 0;
 }
 
+static void disconnect(void)
+{
+   int res = emcute_discon();
+    if (res == EMCUTE_NOGW) {
+        puts("error: not connected to any broker");
+        return ;
+    }
+    else if (res != EMCUTE_OK) {
+        puts("error: unable to disconnect");
+        return ;
+    }
+    puts("Disconnect successful");
+}
 
 {{#operations}}{{#operation}} 
 {{#isSubscribe}}
@@ -101,7 +113,7 @@ static int {{operationId}}(void)
 }
 {{/isSubscribe}}
 
-{{^isSubcribe}}
+{{^isSubscribe}}
 static int {{operationId}}(const void* buf)
 {
    emcute_topic_t t;
@@ -156,6 +168,14 @@ static int {{operationId}}(const void* buf)
                   
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    
+    /* calls function to connect to broker*/
+    connect(); 
+    
+    /*all pub-sub functions to be called here*/
+    
+    /*disconnect from broker before closing the application*/
+    disconnect();
     
     return 0;
 }
